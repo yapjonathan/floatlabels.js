@@ -11,15 +11,18 @@
         var pluginName = "floatlabel",
             defaults = {
                 slideInput                      : true,
-                labelStartTop                   : '0px',
+                labelStartTop                   : '10px',
                 labelEndTop                     : '0px',
+                labelStartLeft                  : '8px',
                 paddingOffset                   : '12px',
+                fontSize                        : '11px',
+                fontWeight                     : 'bold',
                 transitionDuration              : 0.1,
                 transitionEasing                : 'ease-in-out',
                 labelClass                      : '',
                 typeMatches                     : /text|password|email|number|search|url|tel/,
-                focusColor                      : '#838780',
-                blurColor                       : '#2996cc'
+                focusColor                      : '#2996cc',
+                blurColor                       : '#838780'
             };
         function Plugin ( element, options ) {
             this.$element       = $(element);
@@ -32,7 +35,7 @@
                     settings      = this.settings,
                     transDuration = settings.transitionDuration,
                     transEasing   = settings.transitionEasing,
-                    thisElement   = this.$element;              
+                    thisElement   = this.$element;
                 var animationCss = {
                     '-webkit-transition'            : 'all ' + transDuration + 's ' + transEasing,
                     '-moz-transition'               : 'all ' + transDuration + 's ' + transEasing,
@@ -40,8 +43,7 @@
                     '-ms-transition'                : 'all ' + transDuration + 's ' + transEasing,
                     'transition'                    : 'all ' + transDuration + 's ' + transEasing
                 };
-                if( thisElement.prop('tagName').toUpperCase() != 'INPUT' &&
-                    thisElement.prop('tagName').toUpperCase() != 'TEXTAREA') { return; }
+                if( thisElement.prop('tagName').toUpperCase() !== 'INPUT' && thisElement.prop('tagName').toUpperCase() !== 'TEXTAREA' && thisElement.prop('tagName').toUpperCase() !== 'SELECT') { return; }
                 if( thisElement.prop('tagName').toUpperCase() === 'INPUT' &&
                     !settings.typeMatches.test( thisElement.attr('type') ) ) { return; }
                 var elementID = thisElement.attr('id');
@@ -59,23 +61,41 @@
                 thisElement.wrap('<div class="floatlabel-wrapper" style="position:relative"></div>');
                 thisElement.before('<label for="' + elementID + '" class="label-floatlabel ' + settings.labelClass + ' ' + extraClasses + '">' + floatingText + '</label>');
                 this.$label = thisElement.prev('label');
-                this.$label.css({
-                    'position'                      : 'absolute',
-                    'top'                           : settings.labelStartTop,
-                    'left'                          : '8px', //thisElement.css('padding-left'),
-                    'display'                       : 'none',
-                    '-moz-opacity'                  : '0',
-                    '-khtml-opacity'                : '0',
-                    '-webkit-opacity'               : '0',
-                    'opacity'                       : '0',
-                    'font-size'                     : '11px',
-                    'font-weight'                   : 'bold',
-                    'color'                         : self.settings.blurColor
-                });
-                if( !settings.slideInput ) {                    
+                if (thisElement.prop('tagName').toUpperCase() == 'SELECT') {
+                    this.$label.css({
+                        'position'                      : 'absolute',
+                        'top'                           : self.settings.labelStartTop,
+                        'left'                          : self.settings.labelStartLeft, //thisElement.css('padding-left'),
+                        'font-size'                     : self.settings.fontSize,
+                        'font-weight'                   : self.settings.fontWeight,
+                        'color'                         : self.settings.blurColor,
+                        'background-color'              : self.settings.backgroundColor,
+                        'display'                       : 'block',
+                        '-moz-opacity'                  : '1',
+                        '-khtml-opacity'                : '1',
+                        '-webkit-opacity'               : '1',
+                        'opacity'                       : '1'
+                    });
+                } else {
+                    this.$label.css({
+                        'position'                      : 'absolute',
+                        'top'                           : self.settings.labelStartTop,
+                        'left'                          : self.settings.labelStartLeft, //thisElement.css('padding-left'),
+                        'font-size'                     : self.settings.fontSize,
+                        'font-weight'                   : self.settings.fontWeight,
+                        'color'                         : self.settings.blurColor,
+                        'background-color'              : self.settings.backgroundColor,
+                        'display'                       : 'none',
+                        '-moz-opacity'                  : '0',
+                        '-khtml-opacity'                : '0',
+                        '-webkit-opacity'               : '0',
+                        'opacity'                       : '0'
+                    });
+                }
+                if( !settings.slideInput ) {
                     thisElement.css({ 'padding-top' : this.inputPaddingTop });
                 }
-                thisElement.on('keyup blur change', function( e ) {
+                thisElement.on('keyup blur change input', function( e ) {
                     self.checkValue( e );
                 });
                 thisElement.on('blur', function() { thisElement.prev('label').css({ 'color' : self.settings.blurColor }); });
@@ -89,25 +109,27 @@
             checkValue: function( e ) {
                 if( e ) {
                     var keyCode         = e.keyCode || e.which;
-                    if( keyCode === 9 ) { return; }                
+                    if( keyCode === 9 ) { return; }
                 }
-                var thisElement  = this.$element, 
+                var thisElement  = this.$element,
                     currentFlout = thisElement.data('flout');
                 if( thisElement.val() !== "" ) { thisElement.data('flout', '1'); }
                 if( thisElement.val() === "" ) { thisElement.data('flout', '0'); }
                 if( thisElement.data('flout') === '1' && currentFlout !== '1' ) {
                     this.showLabel();
                 }
-                if( thisElement.data('flout') === '0' && currentFlout !== '0' ) {
-                    this.hideLabel();
-                }
+                if (thisElement.prop('tagName').toUpperCase() !== 'SELECT') {
+                    if( thisElement.data('flout') === '0' && currentFlout !== '0' ) {
+                        this.hideLabel();
+                    }
+                 }
             },
             showLabel: function() {
                 var self = this;
                 self.$label.css({ 'display' : 'block' });
                 window.setTimeout(function() {
                     self.$label.css({
-                        'top'                           : self.settings.labelEndTop,
+                        'top'                           : self.settings.labelStartTop,
                         '-moz-opacity'                  : '1',
                         '-khtml-opacity'                : '1',
                         '-webkit-opacity'               : '1',
@@ -122,14 +144,18 @@
             hideLabel: function() {
                 var self = this;
                 self.$label.css({
-                    'top'                           : self.settings.labelStartTop,
+                    'top'                           : self.settings.labelEndTop,
                     '-moz-opacity'                  : '0',
                     '-khtml-opacity'                : '0',
                     '-webkit-opacity'               : '0',
                     'opacity'                       : '0'
                 });
                 if( self.settings.slideInput ) {
-                    self.$element.css({ 'padding-top' : parseFloat( self.inputPaddingTop ) - parseFloat(this.settings.paddingOffset) });
+                    if (self.$element.prop('tagName').toUpperCase() !== 'SELECT') {
+                            self.$element.css({ 'padding-top' : parseFloat( self.inputPaddingTop ) - parseFloat(this.settings.paddingOffset) });
+                        } else {
+                            self.$element.css({ 'padding-top' : parseFloat( self.inputPaddingTop ) - parseFloat(this.settings.paddingOffset) - 6 });
+                        }
                 }
                 self.$element.removeClass('active-floatlabel');
                 window.setTimeout(function() {
