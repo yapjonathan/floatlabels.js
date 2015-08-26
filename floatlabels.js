@@ -100,8 +100,18 @@
                 thisElement.on('keyup blur change input', function( e ) {
                     self.checkValue( e );
                 });
-                thisElement.on('blur', function() { thisElement.prev('label').css({ 'color' : self.settings.blurColor }); });
-                thisElement.on('focus', function() { thisElement.prev('label').css({ 'color' : self.settings.focusColor }); });
+                thisElement.on('blur', function() {
+                    thisElement.prev('label').css({ 'color' : self.settings.blurColor });
+                    window.setTimeout( function( e ) {
+                        self.checkValue( e );
+                    }, 100)
+                });
+                thisElement.on('focus', function() {
+                    thisElement.prev('label').css({ 'color' : self.settings.focusColor });
+                    window.setTimeout( function( e ) {
+                        self.checkValue( e );
+                    }, 100)
+                });
                 window.setTimeout( function() {
                     self.$label.css( animationCss );
                     self.$element.css( animationCss );
