@@ -11,7 +11,7 @@
         var pluginName = "floatlabel",
             defaults = {
                 slideInput                      : true,
-                labelStartTop                   : '10px',
+                labelStartTop                   : '3px',
                 labelEndTop                     : '0px',
                 labelStartLeft                  : '8px',
                 paddingOffset                   : '12px',
@@ -64,6 +64,7 @@
                 if (thisElement.prop('tagName').toUpperCase() == 'SELECT') {
                     this.$label.css({
                         'position'                      : 'absolute',
+                        'z-index'                       : '1',
                         'top'                           : self.settings.labelStartTop,
                         'left'                          : self.settings.labelStartLeft, //thisElement.css('padding-left'),
                         'font-size'                     : self.settings.fontSize,
@@ -79,6 +80,7 @@
                 } else {
                     this.$label.css({
                         'position'                      : 'absolute',
+                        'z-index'                       : '1',
                         'top'                           : self.settings.labelStartTop,
                         'left'                          : self.settings.labelStartLeft, //thisElement.css('padding-left'),
                         'font-size'                     : self.settings.fontSize,
